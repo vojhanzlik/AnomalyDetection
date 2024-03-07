@@ -1,4 +1,3 @@
-import os
 
 import grpc
 from concurrent import futures
@@ -14,7 +13,7 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
     def __init__(self):
         self.logger = get_logger(self.__class__.__name__)
         self.my_classifier = FeatureClassifier1()
-        self.my_classifier.load_params("../classifier0.995.pkl")
+        self.my_classifier.load_params("classifier0.995.pkl")
 
     def StreamData(self, request_iterator, context):
         if not request_iterator:
@@ -51,6 +50,3 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         self.logger.info("Server shut down successfully")
 
 
-if __name__ == '__main__':
-    server = AnomalyDetectionServer()
-    server.serve()
