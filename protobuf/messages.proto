@@ -1,0 +1,33 @@
+syntax="proto3";
+
+service AnomalyDetectionService{
+    rpc StreamData(stream AnomalyDetRequest) returns (stream AnomalyDetResponse);
+    rpc SendNumpyArray(NumpyArray) returns (AnomalyDetResponse);
+}
+
+message AnomalyDetRequest{
+    int32 id = 1;
+    float sensor1 = 2;
+    float sensor2 = 3;
+    float sensor3 = 4;
+    float sensor4 = 5;
+    float sensor5 = 6;
+    float sensor6 = 7;
+}
+
+message AnomalyDetResponse{
+    int32 id = 1;
+    bool result = 2;
+}
+
+message NumpyArray {
+    repeated double values = 1;
+    int32 rows = 2;
+    int32 cols = 3;
+}
+
+message Response {
+    string message = 1;
+
+}
+
