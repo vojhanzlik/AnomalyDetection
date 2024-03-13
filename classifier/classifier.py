@@ -5,10 +5,10 @@ import pandas as pd
 import pickle
 
 
-from ml_classifier.plotting import plot_samples
-from ml_classifier.dtw_barycenter import get_distance, compute_dtw_dists
+from plotting import plot_samples
+from dtw_barycenter import get_distance, compute_dtw_dists
 
-from ml_classifier.my_k_means import classify_kmeans, get_cluster_params, GaussianClassifier
+from my_k_means import classify_kmeans, get_cluster_params, GaussianClassifier
 
 
 class LabeledSignal:

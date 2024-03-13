@@ -14,21 +14,19 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emessages.proto\"\x85\x01\n\x11\x41nomalyDetRequest\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0f\n\x07sensor1\x18\x02 \x01(\x02\x12\x0f\n\x07sensor2\x18\x03 \x01(\x02\x12\x0f\n\x07sensor3\x18\x04 \x01(\x02\x12\x0f\n\x07sensor4\x18\x05 \x01(\x02\x12\x0f\n\x07sensor5\x18\x06 \x01(\x02\x12\x0f\n\x07sensor6\x18\x07 \x01(\x02\"0\n\x12\x41nomalyDetResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06result\x18\x02 \x01(\x08\"8\n\nNumpyArray\x12\x0e\n\x06values\x18\x01 \x03(\x01\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\x88\x01\n\x17\x41nomalyDetectionService\x12\x39\n\nStreamData\x12\x12.AnomalyDetRequest\x1a\x13.AnomalyDetResponse(\x01\x30\x01\x12\x32\n\x0eSendNumpyArray\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emessages.proto\"0\n\x12\x41nomalyDetResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06result\x18\x02 \x01(\x08\"D\n\nNumpyArray\x12\x0e\n\x06values\x18\x01 \x03(\x01\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\x12\n\n\x02id\x18\x04 \x01(\x05\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\x81\x01\n\x17\x41nomalyDetectionService\x12\x32\n\nStreamData\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponse(\x01\x30\x01\x12\x32\n\x0eSendNumpyArray\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'messages_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
-  _globals['_ANOMALYDETREQUEST']._serialized_start=19
-  _globals['_ANOMALYDETREQUEST']._serialized_end=152
-  _globals['_ANOMALYDETRESPONSE']._serialized_start=154
-  _globals['_ANOMALYDETRESPONSE']._serialized_end=202
-  _globals['_NUMPYARRAY']._serialized_start=204
-  _globals['_NUMPYARRAY']._serialized_end=260
-  _globals['_RESPONSE']._serialized_start=262
-  _globals['_RESPONSE']._serialized_end=289
-  _globals['_ANOMALYDETECTIONSERVICE']._serialized_start=292
-  _globals['_ANOMALYDETECTIONSERVICE']._serialized_end=428
+  _globals['_ANOMALYDETRESPONSE']._serialized_start=18
+  _globals['_ANOMALYDETRESPONSE']._serialized_end=66
+  _globals['_NUMPYARRAY']._serialized_start=68
+  _globals['_NUMPYARRAY']._serialized_end=136
+  _globals['_RESPONSE']._serialized_start=138
+  _globals['_RESPONSE']._serialized_end=165
+  _globals['_ANOMALYDETECTIONSERVICE']._serialized_start=168
+  _globals['_ANOMALYDETECTIONSERVICE']._serialized_end=297
 # @@protoc_insertion_point(module_scope)

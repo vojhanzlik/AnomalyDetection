@@ -1,0 +1,12 @@
+{
+  "input_config" : {
+
+    "server" : {
+      "identifier_row" : [true, 7]
+    },
+
+    "classifier" : {
+      "cols" : 6
+    }
+  }
+}

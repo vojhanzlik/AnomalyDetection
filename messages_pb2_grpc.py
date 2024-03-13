@@ -16,7 +16,7 @@ class AnomalyDetectionServiceStub(object):
         """
         self.StreamData = channel.stream_stream(
                 '/AnomalyDetectionService/StreamData',
-                request_serializer=messages__pb2.AnomalyDetRequest.SerializeToString,
+                request_serializer=messages__pb2.NumpyArray.SerializeToString,
                 response_deserializer=messages__pb2.AnomalyDetResponse.FromString,
                 )
         self.SendNumpyArray = channel.unary_unary(
@@ -46,7 +46,7 @@ def add_AnomalyDetectionServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
             'StreamData': grpc.stream_stream_rpc_method_handler(
                     servicer.StreamData,
-                    request_deserializer=messages__pb2.AnomalyDetRequest.FromString,
+                    request_deserializer=messages__pb2.NumpyArray.FromString,
                     response_serializer=messages__pb2.AnomalyDetResponse.SerializeToString,
             ),
             'SendNumpyArray': grpc.unary_unary_rpc_method_handler(
@@ -76,7 +76,7 @@ class AnomalyDetectionService(object):
             timeout=None,
             metadata=None):
         return grpc.experimental.stream_stream(request_iterator, target, '/AnomalyDetectionService/StreamData',
-            messages__pb2.AnomalyDetRequest.SerializeToString,
+            messages__pb2.NumpyArray.SerializeToString,
             messages__pb2.AnomalyDetResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
