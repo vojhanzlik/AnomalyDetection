@@ -1,4 +1,3 @@
-
 import grpc
 from concurrent import futures
 import numpy as np
@@ -19,9 +18,10 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         self.identifier_idx = 6
         self.classifier_rows_num = 6
 
-
     def StreamData(self, request_iterator, context):
+        self.logger.info("Received SendNumpyArray stream request")
         if not request_iterator:
+            self.logger.error("Invalid request iterator")
             raise grpc.RpcError
 
         time_series = np.array(self.classifier_rows_num * [[]])
@@ -72,22 +72,3 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         # server.stop(None)
         server.wait_for_termination()
         self.logger.info("Server shut down successfully")
-
-    def process_data(self, data, i):
-        start_indices = np.where(np.diff(data[10, :]) == i)[0]
-        if len(start_indices) == 0:
-            return
-
-        end_indices = np.where(np.diff(data[10, :]) == -i)[0]
-        if len(end_indices) == 0:
-            return
-
-        if data[10, 0] == i:
-            start_indices = start_indices[1:]
-
-        if data[10, -1] == i:
-            end_indices = end_indices[:-1]
-
-        for start, end in zip(start_indices, end_indices):
-            sliced_data = data[:, start:end + 1]
-            return sliced_data

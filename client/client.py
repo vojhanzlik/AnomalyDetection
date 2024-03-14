@@ -1,3 +1,4 @@
+import time
 from abc import ABC, abstractmethod
 from typing import Iterator
 
@@ -8,6 +9,18 @@ from helpers import get_logger, extract_non_zero_id_data
 from test import main, main_realtime
 from messages_pb2 import NumpyArray
 from messages_pb2_grpc import AnomalyDetectionServiceStub
+
+
+def wait_for_nonempty(iterator, timeout=10):
+    start_time = time.time()
+    while time.time() - start_time < timeout:
+        try:
+            next(iterator)
+            return True  # Iterator is not empty
+        except StopIteration:
+            # Iterator is empty, wait for a short interval before retrying
+            time.sleep(0.1)
+    return False  # Timeout reached without nonempty response
 
 
 class ClientBase(ABC):
@@ -23,10 +36,13 @@ class ClientBase(ABC):
         pass
 
     def stream_data(self, generator):
-        response_iterator = self.stub.StreamData(self._stream_messages(generator))
-        for response in response_iterator:
-            self.logger.info("Server response: ", int(response.id),
-                             bool(response.result))
+        try:
+            response_iterator = self.stub.StreamData(self._stream_messages(generator), timeout=10)
+            for response in response_iterator:
+                self.logger.info("Server response: ", int(response.id),
+                                 bool(response.result))
+        except Exception as e:
+            self.logger.exception(e)
 
     def send_opc_outputs(self, generator):
         for arr in generator:
@@ -48,8 +64,6 @@ class ClientBase(ABC):
         request = NumpyArray(values=vals, rows=rows, cols=cols, id=i)
         response = self.stub.SendNumpyArray(request)
         self.logger.info(f"Prediction received for id: {response.id}, prediction: {response.result}")
-
-
 
 
 class MyClient(ClientBase):

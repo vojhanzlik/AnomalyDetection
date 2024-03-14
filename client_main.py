@@ -13,13 +13,14 @@ def plot_array(data):
     plt.show()
 
 
-def test_main():
+def main_t():
     for i in range(5):
         data = np.load(f"test_samples/samples{i}.npy")
         selected_rows = data[4:11, :]
         yield selected_rows
 
-def test_realtime_main():
+
+def realtime_main():
     for i in range(5):
         data = np.load(f"test_samples/samples{i}.npy")
         selected_rows = data[4:11, :]
@@ -28,11 +29,10 @@ def test_realtime_main():
 
 
 if __name__ == '__main__':
-
     c = MyClient()
 
-    #c.send_opc_outputs(test_main())
-    c.stream_data(test_realtime_main())
+    # c.send_opc_outputs(main_t())
+    c.stream_data(realtime_main())
 
     # transposed_array = data.T
     # selected_cols = transposed_array[:, 4:11]
