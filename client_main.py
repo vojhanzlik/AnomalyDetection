@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-from client.client import MyClient
-from test import main
+from client.MyClient import MyClient
 
 
 def plot_array(data):
@@ -30,9 +29,8 @@ def realtime_main():
 
 if __name__ == '__main__':
     c = MyClient()
-
     # c.send_opc_outputs(main_t())
-    c.stream_data(realtime_main())
+    c.stream_data()
 
     # transposed_array = data.T
     # selected_cols = transposed_array[:, 4:11]

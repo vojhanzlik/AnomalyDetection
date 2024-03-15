@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import datetime
 
 import numpy as np
 import pandas as pd
@@ -177,13 +177,15 @@ def main_realtime():
 
                     val = [node.get_data_value() for node in eI0sample_nodes]
 
+                    arr_to_stream = [val[i].Value.Value for i in range(4, 11)]
+                    arr_to_stream = np.array(arr_to_stream)
+                    yield arr_to_stream
+
                     eI0handsake_bit_node.set_value(DataValue(Variant(False, VariantType.Boolean)))
 
                     for i in range(num_of_traces):
                         samples[i, packet_no * size_of_packet:(packet_no + 1) * size_of_packet] = val[i].Value.Value
 
-                        selected_rows = val[4:11, :]
-                        yield selected_rows
 
                     val = [node.get_data_value() for node in
                            [eI0time_stamp_first_sample_year_node, eI0time_stamp_first_sample_month_node,
@@ -208,13 +210,14 @@ def main_realtime():
                         hs_bit1 = hs_bit1_read
                     val = [node.get_data_value() for node in eI1sample_nodes]
 
+                    arr_to_stream = [val[i].Value.Value for i in range(4, 11)]
+                    arr_to_stream = np.array(arr_to_stream)
+                    yield arr_to_stream
+
                     eI1handsake_bit_node.set_value(DataValue(Variant(False, VariantType.Boolean)))
 
                     for i in range(num_of_traces):
                         samples[i, packet_no * size_of_packet:(packet_no + 1) * size_of_packet] = val[i].Value.Value
-
-                        selected_rows = val[4:11, :]
-                        yield selected_rows
 
                     val = [node.get_data_value() for node in
                            [eI1time_stamp_first_sample_year_node, eI1time_stamp_first_sample_month_node,
@@ -236,10 +239,14 @@ def main_realtime():
             # ua_client.disconnect()
             init_server = 0
             print('Transfer done. Postprocessing the data...')
-            np.save(f"samples{j}.npy", samples)
+
+            current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+            np.save(f"samples{j}_{str(current_datetime)}.npy", samples)
+
             j += 1
             # transposed_array = samples.T
             # selected_cols = transposed_array[:, 4:10]
+
 
             print('Done')
 
@@ -467,7 +474,9 @@ def main():
             # ua_client.disconnect()
             init_server = 0
             print('Transfer done. Postprocessing the data...')
-            np.save(f"samples{j}.npy", samples)
+
+            current_datetime = datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+            np.save(f"samples{j}_{str(current_datetime)}.npy", samples)
             j += 1
             # transposed_array = samples.T
             # selected_cols = transposed_array[:, 4:10]

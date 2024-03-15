@@ -32,7 +32,7 @@ def extract_non_zero_id_data(data, i, identifier_idx):
         return sliced_data
 
 
-class SetQueue:
+class UniqueQueue:
 
     def __init__(self):
         self.set = set()
