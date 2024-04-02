@@ -1,11 +1,12 @@
-import grpc
 from concurrent import futures
+
+import grpc
 import numpy as np
+from classifier_model.classifier import FeatureClassifier1
 
 from helpers import get_logger, extract_non_zero_id_data, UniqueQueue
 from messages_pb2 import AnomalyDetResponse
 from messages_pb2_grpc import AnomalyDetectionServiceServicer, add_AnomalyDetectionServiceServicer_to_server
-from classifier import FeatureClassifier1
 
 
 def rpc_request_arr_to_np_arr(request):
@@ -20,7 +21,7 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         self.address = address
         self.logger = get_logger(self.__class__.__name__)
         self.my_classifier = FeatureClassifier1()
-        self.my_classifier.load_params("classifier6dim0.995.pkl")
+        self.my_classifier.load_params("classifier6dim_new.pkl")
 
         self.identifier_idx = 6
         self.input_rows_num = 7

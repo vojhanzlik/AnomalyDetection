@@ -2,7 +2,7 @@ import time
 from typing import Iterator
 
 import numpy as np
-from client.client import ClientBase
+from client import ClientBase
 from messages_pb2 import NumpyArray
 from test import main_realtime
 
@@ -22,7 +22,7 @@ class MyClient(ClientBase):
                 yield array
 
     def _stream_messages(self) -> Iterator[NumpyArray]:
-        for array in main_realtime():
+        for array in self.yield_test():
             rows = array.shape[0]
             cols = array.shape[1]
             vals = array.flatten()
