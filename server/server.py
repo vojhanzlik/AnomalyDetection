@@ -17,7 +17,7 @@ def rpc_request_arr_to_np_arr(request):
 
 
 class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
-    def __init__(self, address='localhost:8061'):
+    def __init__(self, address='0.0.0.0:8061'):
         self.address = address
         self.logger = get_logger(self.__class__.__name__)
         self.my_classifier = FeatureClassifier1()
@@ -61,7 +61,7 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
                 ids_to_predict.dequeue()
 
     def _prep_arr_for_prediction(self, arr):
-        arr = np.delete(arr, self.identifier_idx, axis=0)
+        #arr = np.delete(arr, self.identifier_idx, axis=0)
         return arr.T
 
     def _update_identifiers(self, array, ids_to_predict):

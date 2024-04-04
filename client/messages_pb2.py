@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emessages.proto\"0\n\x12\x41nomalyDetResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06result\x18\x02 \x01(\x08\"D\n\nNumpyArray\x12\x0e\n\x06values\x18\x01 \x03(\x01\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\x12\n\n\x02id\x18\x04 \x01(\x05\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2\x81\x01\n\x17\x41nomalyDetectionService\x12\x32\n\nStreamData\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponse(\x01\x30\x01\x12\x32\n\x0eSendNumpyArray\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0emessages.proto\"0\n\x12\x41nomalyDetResponse\x12\n\n\x02id\x18\x01 \x01(\x05\x12\x0e\n\x06result\x18\x02 \x01(\x08\"D\n\nNumpyArray\x12\x0e\n\x06values\x18\x01 \x03(\x01\x12\x0c\n\x04rows\x18\x02 \x01(\x05\x12\x0c\n\x04\x63ols\x18\x03 \x01(\x05\x12\n\n\x02id\x18\x04 \x01(\x05\"\x1b\n\x08Response\x12\x0f\n\x07message\x18\x01 \x01(\t2M\n\x17\x41nomalyDetectionService\x12\x32\n\nStreamData\x12\x0b.NumpyArray\x1a\x13.AnomalyDetResponse(\x01\x30\x01\x62\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -27,6 +27,6 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_NUMPYARRAY']._serialized_end=136
   _globals['_RESPONSE']._serialized_start=138
   _globals['_RESPONSE']._serialized_end=165
-  _globals['_ANOMALYDETECTIONSERVICE']._serialized_start=168
-  _globals['_ANOMALYDETECTIONSERVICE']._serialized_end=297
+  _globals['_ANOMALYDETECTIONSERVICE']._serialized_start=167
+  _globals['_ANOMALYDETECTIONSERVICE']._serialized_end=244
 # @@protoc_insertion_point(module_scope)

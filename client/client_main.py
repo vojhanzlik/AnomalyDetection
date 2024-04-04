@@ -13,4 +13,5 @@ def plot_array(data):
 
 if __name__ == '__main__':
     c = MyClient()
+    print()
     c.stream_data()
