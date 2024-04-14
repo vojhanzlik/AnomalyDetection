@@ -5,7 +5,7 @@ import grpc
 
 from messages_pb2 import NumpyArray
 from messages_pb2_grpc import AnomalyDetectionServiceStub
-from server.helpers import get_logger
+from helpers import get_logger
 
 
 class ClientBase(ABC):
