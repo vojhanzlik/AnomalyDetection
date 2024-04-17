@@ -4,7 +4,7 @@ import grpc
 import numpy as np
 from classifier_model.classifier import FeatureClassifier1
 
-from helpers import get_logger, extract_non_zero_id_data, UniqueQueue
+from helpers import get_logger, UniqueQueue
 from messages_pb2 import AnomalyDetResponse
 from messages_pb2_grpc import AnomalyDetectionServiceServicer, add_AnomalyDetectionServiceServicer_to_server
 
@@ -39,7 +39,7 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
             array = rpc_request_arr_to_np_arr(request)
             self.logger.info("Request converted to np array")
 
-            new_ids = self._update_identifiers(array, ids_to_predict)
+            segments = self.get_non_zero_segments(array)
 
             for pred in self._attempt_prediction(ids_to_predict, time_series):
                 yield pred
@@ -49,7 +49,7 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
     def _attempt_prediction(self, ids_to_predict: UniqueQueue, time_series):
         i = ids_to_predict.peak()
         if i > 0:
-            extracted_arr = extract_non_zero_id_data(time_series, i, self.identifier_idx)
+            extracted_arr = self.extract_non_zero_id_data(time_series, i)
             if extracted_arr is not None:
                 extracted_arr = self._prep_arr_for_prediction(extracted_arr)
                 res = self.my_classifier.predict(extracted_arr)
@@ -62,38 +62,42 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         #arr = np.delete(arr, self.identifier_idx, axis=0)
         return arr.T
 
-    def _update_identifiers(self, array, ids_to_predict) -> bool:
-        ret = False
-        unique_ids = self._extract_unique_identifiers(array)
+    def get_non_zero_segments(self, array):
+        ids = self._extract_identifiers(array)
+        if ids.size == 0:
+            return []
+        return self._split_by_ids(array, unique_ids)
 
-        for u_i in unique_ids:
-            try:
-                u_i = int(u_i)
-                if ids_to_predict.enqueue(u_i):
-                    ret = True
-            except Exception as e:
-                self.logger.error(e)
+    def _split_by_ids(self, array, ids):
+        ret = []
+
+        for i in ids:
+            ret.append(self.extract_non_zero_id_series(array, i))
+
         return ret
 
-    def _extract_unique_identifiers(self, array):
+
+    def _extract_identifiers(self, array):
         identifier_arr = array[self.identifier_idx]
         self.logger.info("Extracted identifier array")
         unique_ids = np.unique(identifier_arr[identifier_arr != 0])
         return unique_ids
 
+    def extract_non_zero_id_series(self, data, id):
+        start_indices = np.where(np.diff(data[self.identifier_idx, :]) == id)[0]
+        if len(start_indices) == 0:
+            return None
+
+        end_indices = np.where(np.diff(data[self.identifier_idx, :]) == -id)[0]
+        if len(end_indices) == 0:
+            return None
+
+        for start, end in zip(start_indices, end_indices):
+            sliced_data = data[:, start:end + 1]
+            return sliced_data
+
     def _append_to_time_series(self, array, time_series):
         return np.concatenate((time_series, array), axis=1)
-
-    def SendNumpyArray(self, request, context):
-        self.logger.info("Received SendNumpyArray request")
-        rows = request.rows
-        cols = request.cols
-        values = list(request.values)
-
-        numpy_array = np.array(values).reshape((rows, cols))
-        res = bool(self.my_classifier.predict(numpy_array))
-        self.logger.info(f"Prediction done for id: {request.id}, sending response {res}")
-        return AnomalyDetResponse(id=request.id, result=res)
 
     def serve(self):
         server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
