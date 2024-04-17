@@ -31,29 +31,3 @@ def extract_non_zero_id_data(data, i, identifier_idx):
         sliced_data = data[:, start:end + 1]
         return sliced_data
 
-
-class UniqueQueue:
-
-    def __init__(self):
-        self.set = set()
-        self.queue = deque()
-
-    def enqueue(self, value):
-        if value not in self.set:
-            self.set.add(value)
-            self.queue.append(value)
-
-    def dequeue(self):
-        if len(self.queue) > 0:
-            value = self.queue.popleft()
-            self.set.remove(value)
-            return value
-
-    def peak(self):
-        if len(self.queue) > 0:
-            return self.queue[0]
-        return -1
-
-    def __len__(self):
-
-        return len(self.queue)

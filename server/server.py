@@ -32,7 +32,6 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
             self.logger.error("Invalid request iterator")
             raise grpc.RpcError
 
-        time_series = np.array(self.input_rows_num * [[]])
         ids_to_predict = UniqueQueue()
 
         for request in request_iterator:
@@ -40,15 +39,14 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
             array = rpc_request_arr_to_np_arr(request)
             self.logger.info("Request converted to np array")
 
-            self._update_identifiers(array, ids_to_predict)
-            time_series = self._append_to_time_series(array, time_series)
+            new_ids = self._update_identifiers(array, ids_to_predict)
 
             for pred in self._attempt_prediction(ids_to_predict, time_series):
                 yield pred
 
         self.logger.info("STREAMING DONE")
 
-    def _attempt_prediction(self, ids_to_predict, time_series):
+    def _attempt_prediction(self, ids_to_predict: UniqueQueue, time_series):
         i = ids_to_predict.peak()
         if i > 0:
             extracted_arr = extract_non_zero_id_data(time_series, i, self.identifier_idx)
@@ -64,14 +62,18 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         #arr = np.delete(arr, self.identifier_idx, axis=0)
         return arr.T
 
-    def _update_identifiers(self, array, ids_to_predict):
+    def _update_identifiers(self, array, ids_to_predict) -> bool:
+        ret = False
         unique_ids = self._extract_unique_identifiers(array)
+
         for u_i in unique_ids:
             try:
                 u_i = int(u_i)
-                ids_to_predict.enqueue(u_i)
+                if ids_to_predict.enqueue(u_i):
+                    ret = True
             except Exception as e:
                 self.logger.error(e)
+        return ret
 
     def _extract_unique_identifiers(self, array):
         identifier_arr = array[self.identifier_idx]

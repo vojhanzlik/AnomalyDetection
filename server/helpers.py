@@ -39,9 +39,12 @@ class UniqueQueue:
         self.queue = deque()
 
     def enqueue(self, value):
+        ret = False
         if value not in self.set:
             self.set.add(value)
             self.queue.append(value)
+            ret = True
+        return ret
 
     def dequeue(self):
         if len(self.queue) > 0:
