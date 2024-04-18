@@ -13,7 +13,7 @@ class MyClient(ClientBase):
         super().__init__()
 
     def yield_test(self):
-        for i in range(1, 3):
+        for i in range(1):
             data = np.load(f"test_samples/samples{i}.npy")
             selected_rows = data[4:11, :]
             split_arrays = np.array_split(selected_rows, 24, axis=1)

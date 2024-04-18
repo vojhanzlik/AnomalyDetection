@@ -2,8 +2,7 @@ from concurrent import futures
 
 import grpc
 import numpy as np
-from classifier_model.classifier import FeatureClassifier1
-
+from PROD import deviationClassifier
 from helpers import get_logger, UniqueQueue
 from messages_pb2 import AnomalyDetResponse
 from messages_pb2_grpc import AnomalyDetectionServiceServicer, add_AnomalyDetectionServiceServicer_to_server
@@ -20,8 +19,8 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
     def __init__(self, address='0.0.0.0:8061'):
         self.address = address
         self.logger = get_logger(self.__class__.__name__)
-        self.my_classifier = FeatureClassifier1()
-        self.my_classifier.load_params("classifier6dim_new.pkl")
+        self.my_classifier = deviationClassifier(6, 1)
+        self.my_classifier.load_params("models/deviationClassifier.pkl")
 
         self.identifier_idx = 6
         self.input_rows_num = 7
@@ -32,50 +31,44 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
             self.logger.error("Invalid request iterator")
             raise grpc.RpcError
 
-        ids_to_predict = UniqueQueue()
-
         for request in request_iterator:
             self.logger.info("Received SendNumpyArray request")
             array = rpc_request_arr_to_np_arr(request)
             self.logger.info("Request converted to np array")
 
-            segments = self.get_non_zero_segments(array)
+            segments_lst = self.get_non_zero_segments(array)
 
-            for pred in self._attempt_prediction(ids_to_predict, time_series):
+            for pred in self._attempt_prediction(segments_lst):
                 yield pred
 
         self.logger.info("STREAMING DONE")
 
-    def _attempt_prediction(self, ids_to_predict: UniqueQueue, time_series):
-        i = ids_to_predict.peak()
-        if i > 0:
-            extracted_arr = self.extract_non_zero_id_data(time_series, i)
-            if extracted_arr is not None:
-                extracted_arr = self._prep_arr_for_prediction(extracted_arr)
-                res = self.my_classifier.predict(extracted_arr)
-
-                yield AnomalyDetResponse(id=i, result=res)
-                self.logger.info(f"Send SendNumpyArray response: result: {res}, id: {i}")
-                ids_to_predict.dequeue()
+    def _attempt_prediction(self, data: list):
+        for segment in data:
+            arr_to_predict = self._prep_arr_for_prediction(segment)
+            res = self.my_classifier.predict_partial_signal(arr_to_predict, vis=False)
+            yield AnomalyDetResponse(id=1, result=res)
+            self.logger.info(f"Send SendNumpyArray response: result: {res}, id: {1}")
 
     def _prep_arr_for_prediction(self, arr):
-        #arr = np.delete(arr, self.identifier_idx, axis=0)
+        arr = np.delete(arr, self.identifier_idx, axis=0)
         return arr.T
 
     def get_non_zero_segments(self, array):
         ids = self._extract_identifiers(array)
         if ids.size == 0:
             return []
-        return self._split_by_ids(array, unique_ids)
+        return self._split_by_ids(array, ids)
 
     def _split_by_ids(self, array, ids):
         ret = []
 
         for i in ids:
-            ret.append(self.extract_non_zero_id_series(array, i))
+            non_zero_id_series = self._extract_non_zero_id_series(array, i)
+            if len(non_zero_id_series) != 0:
+                ret.append(non_zero_id_series)
 
         return ret
-
 
     def _extract_identifiers(self, array):
         identifier_arr = array[self.identifier_idx]
@@ -83,18 +76,15 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
         unique_ids = np.unique(identifier_arr[identifier_arr != 0])
         return unique_ids
 
-    def extract_non_zero_id_series(self, data, id):
-        start_indices = np.where(np.diff(data[self.identifier_idx, :]) == id)[0]
-        if len(start_indices) == 0:
-            return None
+    def _extract_non_zero_id_series(self, data, id):
 
-        end_indices = np.where(np.diff(data[self.identifier_idx, :]) == -id)[0]
-        if len(end_indices) == 0:
-            return None
-
-        for start, end in zip(start_indices, end_indices):
-            sliced_data = data[:, start:end + 1]
-            return sliced_data
+        non_zero_idxs = np.where(data[self.identifier_idx, :] == id)[0]
+        if len(non_zero_idxs) == 0:
+            return []
+        start = non_zero_idxs[0]
+        end = non_zero_idxs[-1]
+        sliced_data = data[:, start:end + 1]
+        return sliced_data
 
     def _append_to_time_series(self, array, time_series):
         return np.concatenate((time_series, array), axis=1)

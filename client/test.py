@@ -5,7 +5,6 @@ import pandas as pd
 from opcua import Client
 from opcua.ua import DataValue, Variant, VariantType
 
-from messages_pb2 import NumpyArray
 
 def main_realtime():
     ua_client = Client("opc.tcp://10.41.192.191:4840")
