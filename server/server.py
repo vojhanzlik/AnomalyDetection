@@ -1,8 +1,10 @@
+import pickle
 from concurrent import futures
 
 import grpc
 import numpy as np
 from PROD import deviationClassifier
+from PROD import featureClassifier
 from helpers import get_logger, UniqueQueue
 from messages_pb2 import AnomalyDetResponse
 from messages_pb2_grpc import AnomalyDetectionServiceServicer, add_AnomalyDetectionServiceServicer_to_server
@@ -19,8 +21,10 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
     def __init__(self, address='0.0.0.0:8061'):
         self.address = address
         self.logger = get_logger(self.__class__.__name__)
-        self.my_classifier = deviationClassifier(6, 1)
-        self.my_classifier.load_params("models/deviationClassifier.pkl")
+        with open("models/featureClassifier_2604.pkl", 'rb') as f:
+            loaded_object = pickle.load(f)
+            self.my_classifier = loaded_object
+            self.logger.info(f"Loaded classifier: {self.my_classifier.__class__.__name__}")
 
         self.identifier_idx = 6
         self.input_rows_num = 7
@@ -46,9 +50,10 @@ class AnomalyDetectionServer(AnomalyDetectionServiceServicer):
     def _attempt_prediction(self, data: list):
         for segment in data:
             arr_to_predict = self._prep_arr_for_prediction(segment)
-            res = self.my_classifier.predict_partial_signal(arr_to_predict, vis=False)
-            yield AnomalyDetResponse(id=1, result=res)
-            self.logger.info(f"Send SendNumpyArray response: result: {res}, id: {1}")
+            res = self.my_classifier.predict_partial_signal(arr_to_predict)
+            if res:
+                yield AnomalyDetResponse(id=1, result=res)
+                self.logger.info(f"Send SendNumpyArray response: result: {res}, id: {1}")
 
     def _prep_arr_for_prediction(self, arr):
         arr = np.delete(arr, self.identifier_idx, axis=0)
